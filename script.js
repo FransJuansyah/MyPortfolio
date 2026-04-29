@@ -7,6 +7,14 @@ let w, h;
 function resize() {
     w = canvas.width = window.innerWidth;
     h = canvas.height = window.innerHeight;
+    
+    // Pastikan bintang mengisi ulang area baru saat resize
+    if (stars.length > 0) {
+        stars.forEach(s => {
+            s.x = Math.random() * w;
+            s.y = Math.random() * h;
+        });
+    }
 }
 
 window.addEventListener('resize', resize);
@@ -69,6 +77,10 @@ window.addEventListener('mousemove', (e) => {
 });
 
 function updateCursor() {
+    if (!dot || !ring) return; // Safety check
+    
+    if (window.innerWidth <= 1024) return; // Nonaktifkan di mobile
+
     curX += (targetX - curX) * 0.15;
     curY += (targetY - curY) * 0.15;
     
@@ -106,13 +118,13 @@ function animateCounters(container) {
         const target = +c.getAttribute('data-target');
         let now = 0;
         const update = () => {
-            const step = target / 50;
+        const step = target / 30;
             if (now < target) {
                 now += step;
-                c.innerText = Math.ceil(now);
-                setTimeout(update, 30);
+            c.innerText = Math.floor(now);
+            setTimeout(update, 40);
             } else {
-                c.innerText = target;
+            c.innerText = target + (target === 50 ? "+" : "");
             }
         };
         update();
@@ -131,7 +143,7 @@ const items = document.querySelectorAll('.work-card');
 
 // Initialize: Show 'design' category by default and hide others
 window.addEventListener('DOMContentLoaded', () => {
-    const defaultFilter = 'design';
+    const defaultFilter = 'web';
     items.forEach(item => {
         if (item.dataset.cat === defaultFilter) {
             item.style.display = 'block';
